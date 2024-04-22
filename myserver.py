@@ -3,6 +3,7 @@ import threading
 import ssl
 from tictactoe_game import TicTacToeGame, Player, Move
 
+#function to handle the client requests and responses
 def handle_client(conn, addr, game, player_id):
     while True:
         try:
@@ -24,10 +25,12 @@ def handle_client(conn, addr, game, player_id):
             break
     conn.close()
 
+#function to broadcast messages to all connected clients
 def broadcast(message, game):
     for player in game.players:
         player.conn.sendall(message.encode())
 
+#function to accept connections from clients
 def accept_connections(wrapped_socket, game):
     while len(game.players) < 2:
         conn, addr = wrapped_socket.accept()
@@ -36,15 +39,15 @@ def accept_connections(wrapped_socket, game):
         conn.sendall(f"PLAYER {player_id + 1}".encode())
         threading.Thread(target=handle_client, args=(conn, addr, game, player_id)).start()
 
+#main function to start the server
 def server_main():
-    host = '0.0.0.0'
+    host = '18.191.52.162'
     port = 5555
     context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     context.load_cert_chain(certfile="tictactoe.crt", keyfile="tictactoe.key")
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     wrapped_socket = context.wrap_socket(server_socket, server_side=True)
-    wrapped_socket.bind((host, port))
-
+    wrapped_socket.bind((host, port))    
     wrapped_socket.listen(2)
     print("Server started. Waiting for players...")
 
