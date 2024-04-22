@@ -1,7 +1,7 @@
 import socket
 
 def main():
-    host = '0.0.0.0'
+    host = '18.191.52.162'
     port = 5555
 
     try:

@@ -8,6 +8,7 @@ from tkinter import font
 from tkinter import messagebox, font
 from tic_tac_toe import Move
 
+#class to represent the Tic-Tac-Toe board
 class TicTacToeBoard(tk.Tk):
     def __init__(self, server_address, server_port):
         super().__init__()
@@ -19,7 +20,7 @@ class TicTacToeBoard(tk.Tk):
         self.context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         self.context.load_verify_locations('tictactoe.crt')
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self.client_socket.connect(server_address, server_port)
+        #self.client_socket.connect(server_address, server_port)
         self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='Sam')
         self.wrapped_socket.connect((self.server_address, self.server_port))
         self.player_label = None
@@ -27,6 +28,7 @@ class TicTacToeBoard(tk.Tk):
         self.disable_board()
         threading.Thread(target=self.listen_to_server, daemon=True).start()
 
+    #function to create the game board
     def create_widgets(self):
         self.cells = {}
         self.board_frame = tk.Frame(self)
@@ -41,18 +43,22 @@ class TicTacToeBoard(tk.Tk):
         self.status_label = tk.Label(self, text="Connecting to server...", font=font.Font(size=20))
         self.status_label.pack(pady=20)
 
+    #function to disable the board
     def disable_board(self):
         for button in self.cells.values():
             button.config(state='disabled')
 
+    #function to enable the board
     def enable_board(self):
         for button in self.cells.values():
             button.config(state='normal')
 
+    #function to send the move to the server
     def send_move_to_server(self, row, col):
         self.disable_board()
         self.wrapped_socket.sendall(f"{row}:{col}".encode())
 
+    #function to listen to the server
     def listen_to_server(self):
         while True:
             try:
@@ -60,43 +66,44 @@ class TicTacToeBoard(tk.Tk):
                 if not data:
                     continue
 
+                #handle PLAYER message to assign player number to this client
                 if data.startswith("PLAYER"):
                     self.player_label = data.split()[1]
-                    # Update connection status immediately upon receiving player assignment
+                    #update connection status immediately upon receiving player assignment
                     self.after(0, lambda: self.status_label.config(text=f"You are Player {self.player_label}"))
 
-                    # If this client is Player 1, enable the board to start the game
+                    #if this client is Player 1, enable the board to start the game
                     if self.player_label == "1":
                         self.after(0, self.enable_board)
-
+                #handle MOVE message to update the board with the opponent's move
                 elif data.startswith("MOVE"):
                     _, row, col, label = data.split()
                     self.after(0, lambda: self.update_board(int(row), int(col), label))
 
-                    # Enable the board if it's this client's turn next; this logic might need refinement based on server's game state management
+                    #enable the board if it's this client's turn next; this logic might need refinement based on server's game state management
                     if label != self.player_label:
                         self.after(0, self.enable_board)
 
-                # Handle WIN, TIE, and INVALID MOVE messages as previously described
-
+                #handle WIN, TIE, and INVALID MOVE messages as previously described
+            #handle ConnectionError to notify the user of the lost connection
             except ConnectionError:
                 self.after(0, lambda: messagebox.showerror("Connection Error", "Lost connection to the server."))
                 break
-
+    #function to update the board with the opponent's move
     def update_board(self, row, col, label):
         button = self.cells[(row, col)]
         button.config(text=label, state='disabled')
         self.status_label.config(text=f"Player {label}'s turn")
         if label != self.player_label:
             self.enable_board()
-    
+    #function to handle the window close event
     def get_winning_combos(self):
         rows = [[(move.row, move.col) for move in row] for row in self._current_moves]
         columns = [list(col) for col in zip(*rows)]
         first_diagonal = [row[i] for i, row in enumerate(rows)]
         second_diagonal = [col[j] for j, col in enumerate(reversed(columns))]
         return rows + columns + [first_diagonal, second_diagonal]
-
+    #function to handle the window close event
     def reset_game(self):
         """Reset the game."""
         self.current_player_index = 0
@@ -106,7 +113,7 @@ class TicTacToeBoard(tk.Tk):
             for col, _ in enumerate(row_content):
                 row_content[col] = Move(row, col)
 def main():
-    server_address = '0.0.0.0'  
+    server_address = '18.191.52.162'  
     server_port = 5555
     app = TicTacToeBoard(server_address, server_port)
     app.mainloop()
