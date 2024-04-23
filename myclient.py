@@ -21,7 +21,7 @@ class TicTacToeBoard(tk.Tk):
         self.context.load_verify_locations('tictactoe.crt')
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.client_socket.connect(server_address, server_port)
-        self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='Sam')
+        self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='localhost')
         self.wrapped_socket.connect((self.server_address, self.server_port))
         self.player_label = None
         self.create_widgets()
