@@ -41,7 +41,7 @@ def accept_connections(wrapped_socket, game):
 
 #main function to start the server
 def server_main():
-    host = '18.191.52.162'
+    host = '0.0.0.0'
     port = 5555
     context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     context.load_cert_chain(certfile="tictactoe.crt", keyfile="tictactoe.key")
