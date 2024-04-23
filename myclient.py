@@ -113,7 +113,7 @@ class TicTacToeBoard(tk.Tk):
             for col, _ in enumerate(row_content):
                 row_content[col] = Move(row, col)
 def main():
-    server_address = '18.191.52.162'  
+    server_address = '3.144.106.235'  
     server_port = 5555
     app = TicTacToeBoard(server_address, server_port)
     app.mainloop()
