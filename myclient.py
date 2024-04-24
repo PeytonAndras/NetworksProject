@@ -26,14 +26,14 @@ class TicTacToeBoard(tk.Tk):
         self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='localhost')
         self.wrapped_socket.connect((self.server_address, self.server_port))
         self.player_label = None
-        self.connect_to_server()
 
         self.create_widgets()
         self.disable_board()
+        self.connect_to_server()
 
         # Ensure connection setup is initiated after the GUI has been initialized
         self.after(100, self.connect_to_server)  # Delay connection to ensure UI loads properly
-        
+
         threading.Thread(target=self.listen_to_server, daemon=True).start()
 
         def connect_to_server(self):
