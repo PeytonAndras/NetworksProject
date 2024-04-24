@@ -7,45 +7,26 @@ from typing import NamedTuple
 from tkinter import font
 from tkinter import messagebox, font
 from tic_tac_toe import Move
-import time
 
 #class to represent the Tic-Tac-Toe board
 class TicTacToeBoard(tk.Tk):
     def __init__(self, server_address, server_port):
         super().__init__()
+        #self.game_logic = tic_tac_toe.TicTacToeGame.get_winning_combos()
         self.title("Tic-Tac-Toe Game")
+        self.winner_combo = []
         self.server_address = server_address
         self.server_port = server_port
-
         self.context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         self.context.load_verify_locations('tictactoe.crt')
-
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.client_socket.connect(server_address, server_port)
         self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='localhost')
         self.wrapped_socket.connect((self.server_address, self.server_port))
         self.player_label = None
-
         self.create_widgets()
         self.disable_board()
-        #self.connect_to_server()
-
-        # Ensure connection setup is initiated after the GUI has been initialized
-        self.after(100, self.connect_to_server)  # Delay connection to ensure UI loads properly
-
         threading.Thread(target=self.listen_to_server, daemon=True).start()
-
-        def connect_to_server(self):
-        #establishes the socket connection with the server
-            try:
-                self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='localhost')
-                self.wrapped_socket.connect((self.server_address, self.server_port))
-                if not self.player_label:  # Start listening to the server if not already listening
-                    threading.Thread(target=self.listen_to_server, daemon=True).start()
-            except (socket.error, ssl.SSLError) as e:
-                messagebox.showerror("Connection Error", f"Failed to connect: {e}")
-                # Schedule a reconnection attempt
-                self.after(5000, self.connect_to_server)  # Try to reconnect every 5 seconds
 
     #function to create the game board
     def create_widgets(self):
@@ -74,13 +55,8 @@ class TicTacToeBoard(tk.Tk):
 
     #function to send the move to the server
     def send_move_to_server(self, row, col):
-        #sends a move to the server, handling possible disconnection
-        try:
-            self.disable_board()
-            self.wrapped_socket.sendall(f"{row}:{col}".encode())
-        except socket.error:
-            messagebox.showinfo("Connection Error", "Connection lost. Trying to reconnect...")
-            self.connect_to_server()
+        self.disable_board()
+        self.wrapped_socket.sendall(f"{row}:{col}".encode())
 
     #function to listen to the server
     def listen_to_server(self):
@@ -88,7 +64,7 @@ class TicTacToeBoard(tk.Tk):
             try:
                 data = self.wrapped_socket.recv(1024).decode()
                 if not data:
-                    raise ConnectionError("No data received")
+                    continue
 
                 #handle PLAYER message to assign player number to this client
                 if data.startswith("PLAYER"):
@@ -110,11 +86,9 @@ class TicTacToeBoard(tk.Tk):
 
                 #handle WIN, TIE, and INVALID MOVE messages as previously described
             #handle ConnectionError to notify the user of the lost connection
-            except Exception as e:
-                messagebox.showinfo("Connection Error", f"Connection lost: {e}")
-                self.connect_to_server()
-                break #exit the loop if an exception occurs
-
+            except ConnectionError:
+                self.after(0, lambda: messagebox.showerror("Connection Error", "Lost connection to the server."))
+                break
     #function to update the board with the opponent's move
     def update_board(self, row, col, label):
         button = self.cells[(row, col)]
