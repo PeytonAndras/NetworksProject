@@ -13,9 +13,7 @@ import time
 class TicTacToeBoard(tk.Tk):
     def __init__(self, server_address, server_port):
         super().__init__()
-        #self.game_logic = tic_tac_toe.TicTacToeGame.get_winning_combos()
         self.title("Tic-Tac-Toe Game")
-        self.winner_combo = []
         self.server_address = server_address
         self.server_port = server_port
 
@@ -29,7 +27,7 @@ class TicTacToeBoard(tk.Tk):
 
         self.create_widgets()
         self.disable_board()
-        self.connect_to_server()
+        #self.connect_to_server()
 
         # Ensure connection setup is initiated after the GUI has been initialized
         self.after(100, self.connect_to_server)  # Delay connection to ensure UI loads properly
