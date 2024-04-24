@@ -18,16 +18,22 @@ class TicTacToeBoard(tk.Tk):
         self.winner_combo = []
         self.server_address = server_address
         self.server_port = server_port
+
         self.context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         self.context.load_verify_locations('tictactoe.crt')
+
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.client_socket.connect(server_address, server_port)
         self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='localhost')
         self.wrapped_socket.connect((self.server_address, self.server_port))
         self.player_label = None
         self.connect_to_server()
+
         self.create_widgets()
         self.disable_board()
+
+        # Ensure connection setup is initiated after the GUI has been initialized
+        self.after(100, self.connect_to_server)  # Delay connection to ensure UI loads properly
+        
         threading.Thread(target=self.listen_to_server, daemon=True).start()
 
         def connect_to_server(self):
@@ -110,7 +116,7 @@ class TicTacToeBoard(tk.Tk):
                 messagebox.showinfo("Connection Error", f"Connection lost: {e}")
                 self.connect_to_server()
                 break #exit the loop if an exception occurs
-            
+
     #function to update the board with the opponent's move
     def update_board(self, row, col, label):
         button = self.cells[(row, col)]
