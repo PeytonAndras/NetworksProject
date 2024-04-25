@@ -124,7 +124,7 @@ class TicTacToeBoard(tk.Tk):
                 self.cells[(row, col)].config(text='', state='normal')  # Clear text and enable button
         self.status_label.config(text="Game reset. Waiting for moves.")
 def main():
-    server_address = '0.0.0.0'  #3.144.106.235
+    server_address = '3.144.106.235'  #3.144.106.235
     server_port = 5555
     app = TicTacToeBoard(server_address, server_port)
     app.mainloop()
