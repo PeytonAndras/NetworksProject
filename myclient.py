@@ -2,11 +2,10 @@ import socket
 import threading
 import ssl
 import tkinter as tk
-import tic_tac_toe 
 from typing import NamedTuple
 from tkinter import font
 from tkinter import messagebox, font
-from tic_tac_toe import Move
+from tictactoe_game import Move, TicTacToeGame, Player
 
 #class to represent the Tic-Tac-Toe board
 class TicTacToeBoard(tk.Tk):
@@ -15,6 +14,7 @@ class TicTacToeBoard(tk.Tk):
         #self.game_logic = tic_tac_toe.TicTacToeGame.get_winning_combos()
         self.title("Tic-Tac-Toe Game")
         self.winner_combo = []
+        self._current_moves = [[None for _ in range(3)] for _ in range(3)]
         self.server_address = server_address
         self.server_port = server_port
         self.context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
@@ -67,7 +67,7 @@ class TicTacToeBoard(tk.Tk):
                     continue
 
                 #handle PLAYER message to assign player number to this client
-                if data.startswith("PLAYER"):
+                if data.startswith("PLAYER") and self.player_label == None:
                     self.player_label = data.split()[1]
                     #update connection status immediately upon receiving player assignment
                     self.after(0, lambda: self.status_label.config(text=f"You are Player {self.player_label}"))
@@ -84,6 +84,14 @@ class TicTacToeBoard(tk.Tk):
                     if label != self.player_label:
                         self.after(0, self.enable_board)
 
+                if data.startswith("WIN"):
+                    self.reset_game()
+                    self.status_label.config(text="You Win!")
+                
+                if data.startswith("TIE"):
+                    self.reset_game()
+                    self.status_label.config("Tie!")
+
                 #handle WIN, TIE, and INVALID MOVE messages as previously described
             #handle ConnectionError to notify the user of the lost connection
             except ConnectionError:
@@ -91,11 +99,15 @@ class TicTacToeBoard(tk.Tk):
                 break
     #function to update the board with the opponent's move
     def update_board(self, row, col, label):
+        self._current_moves[row][col] = label  # Update the internal state
         button = self.cells[(row, col)]
         button.config(text=label, state='disabled')
-        self.status_label.config(text=f"Player {label}'s turn")
-        if label != self.player_label:
+        if label == self.player_label:
+            self.status_label.config(text="Your turn")
+        else:
+            self.status_label.config(text="Opponent's turn")
             self.enable_board()
+
     #function to handle the window close event
     def get_winning_combos(self):
         rows = [[(move.row, move.col) for move in row] for row in self._current_moves]
@@ -106,14 +118,13 @@ class TicTacToeBoard(tk.Tk):
     #function to handle the window close event
     def reset_game(self):
         """Reset the game."""
-        self.current_player_index = 0
-        self._has_winner = False
-        self.winner_combo = []
-        for row, row_content in enumerate(self._current_moves):
-            for col, _ in enumerate(row_content):
-                row_content[col] = Move(row, col)
+        self._current_moves = [['' for _ in range(3)] for _ in range(3)]  # Reset the current moves
+        for row in range(3):
+            for col in range(3):
+                self.cells[(row, col)].config(text='', state='normal')  # Clear text and enable button
+        self.status_label.config(text="Game reset. Waiting for moves.")
 def main():
-    server_address = '3.144.106.235'  
+    server_address = '0.0.0.0'  #3.144.106.235
     server_port = 5555
     app = TicTacToeBoard(server_address, server_port)
     app.mainloop()

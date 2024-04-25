@@ -65,5 +65,3 @@ class TicTacToeGame:
         self.current_player_index = 0
         self.has_winner = False
         self.winner_combo = []
-
-

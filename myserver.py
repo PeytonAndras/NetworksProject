@@ -16,6 +16,7 @@ def handle_client(conn, addr, game, player_id):
             if valid_move:
                 broadcast(f"MOVE {row} {col} {game.players[player_id].label}", game)
                 if game_status != "":
+                    print("theres a winner or a tie")
                     broadcast(game_status, game)
                     game.reset_game()
             else:
@@ -47,7 +48,7 @@ def server_main():
     context.load_cert_chain(certfile="tictactoe.crt", keyfile="tictactoe.key")
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     wrapped_socket = context.wrap_socket(server_socket, server_side=True)
-    wrapped_socket.bind((host, port))    
+    wrapped_socket.bind((host, port))
     wrapped_socket.listen(2)
     print("Server started. Waiting for players...")
 
