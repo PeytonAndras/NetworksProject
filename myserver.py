@@ -50,7 +50,10 @@ def handle_disconnect(game, player_id, wrapped_socket):
     print(len(game.players))
     print(f"Player {player_id + 1} disconnected")
     if len(game.players) == 1:
-        # game.reset_game()
+        broadcast("OPPONENT_DISCONNECTED", game)
+        game.players.pop(0)
+        print("Player 2 wins by default")
+        game.reset_game()
         accept_connections(wrapped_socket, game)
 
 
