@@ -35,7 +35,6 @@ def broadcast(message, game):
     for player in game.players:
         player.conn.sendall(message.encode())
 
-
 #function to accept connections from clients
 def accept_connections(wrapped_socket, game):
     while len(game.players) < 2:
@@ -51,7 +50,7 @@ def handle_disconnect(game, player_id, wrapped_socket):
     print(len(game.players))
     print(f"Player {player_id + 1} disconnected")
     if len(game.players) == 1:
-        game.reset_game()
+        # game.reset_game()
         accept_connections(wrapped_socket, game)
 
 
