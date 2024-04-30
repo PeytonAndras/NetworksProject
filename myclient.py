@@ -29,6 +29,12 @@ class TicTacToeBoard(tk.Tk):
         self.disable_board()
         threading.Thread(target=self.listen_to_server, daemon=True).start()
 
+    # def remove_player(self, player_id):
+    #     self.players.pop(player_id)
+    #     print(f"Player {player_id + 1} disconnected")
+    #     if len(self.players) == 1:
+    #         self.reset_game()
+
     #function to create the game board
     def create_widgets(self):
         self.cells = {}

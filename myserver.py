@@ -27,12 +27,6 @@ def handle_client(conn, addr, game, player_id):
             conn.close()
             handle_disconnect(game, player_id)
             break
-    
-def remove_player(game, player_id):
-    game.remove_player(player_id)
-    print(f"Player {player_id + 1} disconnected")
-    if len(game.players) == 1:
-        game.reset_game()
 
 #function to broadcast messages to all connected clients
 def broadcast(message, game):
@@ -41,7 +35,6 @@ def broadcast(message, game):
 
 #function to handle the client disconnect
 def handle_disconnect(game, player_id):
-    game.remove_player(player_id)
     print(f"Player {player_id + 1} disconnected")
     if len(game.players) == 1:
         game.reset_game()
