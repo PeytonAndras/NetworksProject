@@ -27,6 +27,7 @@ def handle_client(conn, addr, game, player_id):
             print(f"Error handling client {addr}: {e}")
     finally:
         conn.close()
+        print(len(game.players))
         handle_disconnect(game, player_id)
 
 #function to broadcast messages to all connected clients
@@ -47,6 +48,7 @@ def accept_connections(wrapped_socket, game):
 #function to handle the client disconnect
 def handle_disconnect(game, player_id):
     game.players.pop(player_id)
+    print(len(game.players))
     print(f"Player {player_id + 1} disconnected")
     if len(game.players) == 1:
         game.reset_game()
