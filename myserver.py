@@ -46,17 +46,16 @@ def accept_connections(wrapped_socket, game):
 
 #function to handle the client disconnect
 def handle_disconnect(game, player_id, wrapped_socket):
-    game.players.pop(player_id)
+    #game.players.pop(player_id)
     print(len(game.players))
     print(f"Player {player_id + 1} disconnected")
-    if len(game.players) == 1:
-        if(player_id == 1):
-            game.players.pop(0)
-        else: game.players.pop(1)
-        broadcast("OPPONENT_DISCONNECTED", game)
-        print("Player 2 wins by default")
-        game.reset_game()
-        accept_connections(wrapped_socket, game)
+    if(player_id == 1):
+        game.players.pop(0)
+    else: game.players.pop(1)
+    broadcast("OPPONENT_DISCONNECTED", game)
+    print("Player 2 wins by default")
+    game.reset_game()
+    accept_connections(wrapped_socket, game)
 
 
 #main function to start the server
