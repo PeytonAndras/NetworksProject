@@ -3,9 +3,6 @@ import threading
 import ssl
 from tictactoe_game import TicTacToeGame, Player, Move
 
-global wrapped_socket
-
-#function to handle the client requests and responses
 def handle_client(conn, addr, game, player_id, wrapped_socket):
     try:
         while True:
@@ -34,12 +31,10 @@ def handle_client(conn, addr, game, player_id, wrapped_socket):
         print(len(game.players))
         handle_disconnect(game, player_id, wrapped_socket)
 
-#function to broadcast messages to all connected clients
 def broadcast(message, game):
     for player in game.players:
         player.conn.sendall(message.encode())
 
-#function to accept connections from clients
 def accept_connections(wrapped_socket, game):
     while len(game.players) < 2:
         conn, addr = wrapped_socket.accept()
@@ -48,7 +43,6 @@ def accept_connections(wrapped_socket, game):
         conn.sendall(f"PLAYER {player_id + 1}".encode())
         threading.Thread(target=handle_client, args=(conn, addr, game, player_id, wrapped_socket)).start()
 
-#function to handle the client disconnect
 def handle_disconnect(game, player_id, wrapped_socket):
     print(len(game.players))
     print(f"Player {player_id + 1} disconnected")
@@ -61,7 +55,6 @@ def handle_disconnect(game, player_id, wrapped_socket):
     accept_connections(wrapped_socket, game)
 
 
-#main function to start the server
 def server_main():
     host = '0.0.0.0'
     port = 5555
