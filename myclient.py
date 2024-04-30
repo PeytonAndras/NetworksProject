@@ -95,13 +95,13 @@ class TicTacToeBoard(tk.Tk):
                 
                 if data.startswith("TIE"):
                     self.reset_game()
-                    self.status_label.config("Tie!")
+                    self.status_label.config(text="Tie!")
 
                 if data.startswith("PLAYER 1 TURN"):
-                    self.status_label.config("Player 1's Turn")
+                    self.status_label.config(text="Player 1's Turn")
                 
                 if data.startswith("PLAYER 2 TURN"):
-                    self.status_label.config("Player 2's Turn")
+                    self.status_label.config(text="Player 2's Turn")
 
                 #handle WIN, TIE, and INVALID MOVE messages as previously described
             #handle ConnectionError to notify the user of the lost connection
