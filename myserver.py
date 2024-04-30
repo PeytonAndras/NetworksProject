@@ -46,7 +46,6 @@ def accept_connections(wrapped_socket, game):
 
 #function to handle the client disconnect
 def handle_disconnect(game, player_id, wrapped_socket):
-    game.players.pop(player_id)
     print(len(game.players))
     print(f"Player {player_id + 1} disconnected")
     if len(game.players) == 1:
