@@ -5,8 +5,8 @@ from tictactoe_game import TicTacToeGame, Player, Move
 
 #function to handle the client requests and responses
 def handle_client(conn, addr, game, player_id):
-    while True:
-        try:
+    try:
+        while True:
             data = conn.recv(1024).decode()
             if not data:
                 break
@@ -21,12 +21,11 @@ def handle_client(conn, addr, game, player_id):
                     game.reset_game()
             else:
                 conn.sendall("INVALID MOVE".encode())
-        except Exception as e:
+    except Exception as e:
             print(f"Error handling client {addr}: {e}")
-        # finally:
-        #     # conn.close()
-        #     # handle_disconnect(game, player_id)
-        #     # break
+    finally:
+        conn.close()
+        handle_disconnect(game, player_id)
 
 #function to broadcast messages to all connected clients
 def broadcast(message, game):
