@@ -23,13 +23,23 @@ def handle_client(conn, addr, game, player_id):
                 conn.sendall("INVALID MOVE".encode())
         except Exception as e:
             print(f"Error handling client {addr}: {e}")
+        finally:
+            conn.close()
+            handle_disconnect(game, player_id)
             break
-    conn.close()
+    
 
 #function to broadcast messages to all connected clients
 def broadcast(message, game):
     for player in game.players:
         player.conn.sendall(message.encode())
+
+#function to handle the client disconnect
+def handle_disconnect(game, player_id):
+    game.remove_player(player_id)
+    print(f"Player {player_id + 1} disconnected")
+    if len(game.players) == 0:
+        game.reset_game()
 
 #function to accept connections from clients
 def accept_connections(wrapped_socket, game):

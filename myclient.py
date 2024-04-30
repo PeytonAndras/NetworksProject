@@ -1,6 +1,7 @@
 import socket
 import threading
 import ssl
+import time
 import tkinter as tk
 from typing import NamedTuple
 from tkinter import font
@@ -79,6 +80,10 @@ class TicTacToeBoard(tk.Tk):
                 elif data.startswith("MOVE"):
                     _, row, col, label = data.split()
                     self.after(0, lambda: self.update_board(int(row), int(col), label))
+                    
+                elif data.startswith("OPPONENT_DISCONNECTED"):
+                    self.after(0, lambda: messagebox.showinfo("Game Info", "Your opponent has disconnected."))
+                    self.after(0, self.disable_board)
 
                     #enable the board if it's this client's turn next; this logic might need refinement based on server's game state management
                     if label != self.player_label:
@@ -96,7 +101,29 @@ class TicTacToeBoard(tk.Tk):
             #handle ConnectionError to notify the user of the lost connection
             except ConnectionError:
                 self.after(0, lambda: messagebox.showerror("Connection Error", "Lost connection to the server."))
+                self.attempt_reconnect()
                 break
+    
+    #function to attempt reconnection
+    def attempt_reconnect(self):
+        attempts = 5
+        for attempt in range(attempts):
+            try:
+                self.after(0, lambda: self.status_label.config(text=f"Reconnecting... ({attempt + 1}/{attempts})"))
+                time.sleep(2)  # Wait a bit before trying to reconnect
+                self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='localhost')
+                self.wrapped_socket.connect((self.server_address, self.server_port))
+                self.after(0, lambda: self.status_label.config(text="Reconnected!"))
+                threading.Thread(target=self.listen_to_server, daemon=True).start()
+                self.after(0, self.enable_board)
+                return  # Exit the function upon successful reconnection
+            except Exception as e:
+                print(f"Reconnection attempt {attempt + 1} failed: {e}")
+
+        self.after(0, lambda: self.status_label.config(text="Failed to reconnect. Please restart the application."))
+        self.disable_board()
+
     #function to update the board with the opponent's move
     def update_board(self, row, col, label):
         self._current_moves[row][col] = label  # Update the internal state
