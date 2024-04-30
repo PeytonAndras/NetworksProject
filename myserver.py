@@ -13,6 +13,10 @@ def handle_client(conn, addr, game, player_id, wrapped_socket):
             if not data:
                 break
             print(f"Received move from {addr}: {data}")
+            if player_id == 0:
+                broadcast("PLAYER 2 TURN", game)
+            else:
+                broadcast("PLAYER 1 TURN", game)
             row, col = map(int, data.split(':'))
             valid_move, game_status = game.process_move(Move(row, col, game.players[player_id].label), player_id)
             if valid_move:
