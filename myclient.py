@@ -21,7 +21,7 @@ class TicTacToeBoard(tk.Tk):
         self.context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         self.context.load_verify_locations('tictactoe.crt')
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.client_socket.connect(server_address, server_port)
+        # self.client_socket.connect(server_address, server_port)
         self.wrapped_socket = self.context.wrap_socket(self.client_socket, server_hostname='localhost')
         self.wrapped_socket.connect((self.server_address, self.server_port))
         self.player_label = None
@@ -29,11 +29,11 @@ class TicTacToeBoard(tk.Tk):
         self.disable_board()
         threading.Thread(target=self.listen_to_server, daemon=True).start()
 
-    def remove_player(self, player_id):
-        self.players.pop(player_id)
-        print(f"Player {player_id + 1} disconnected")
-        if len(self.players) == 1:
-            self.reset_game()
+    # def remove_player(self, player_id):
+    #     self.players.pop(player_id)
+    #     print(f"Player {player_id + 1} disconnected")
+    #     if len(self.players) == 1:
+    #         self.reset_game()
 
     #function to create the game board
     def create_widgets(self):
