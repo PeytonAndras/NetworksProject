@@ -23,10 +23,10 @@ def handle_client(conn, addr, game, player_id):
                 conn.sendall("INVALID MOVE".encode())
         except Exception as e:
             print(f"Error handling client {addr}: {e}")
-        finally:
-            conn.close()
-            handle_disconnect(game, player_id)
-            break
+        # finally:
+        #     # conn.close()
+        #     # handle_disconnect(game, player_id)
+        #     # break
 
 #function to broadcast messages to all connected clients
 def broadcast(message, game):
