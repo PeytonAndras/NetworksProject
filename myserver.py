@@ -6,7 +6,7 @@ from tictactoe_game import TicTacToeGame, Player, Move
 global wrapped_socket
 
 #function to handle the client requests and responses
-def handle_client(conn, addr, game, player_id):
+def handle_client(conn, addr, game, player_id, wrapped_socket):
     try:
         while True:
             data = conn.recv(1024).decode()
@@ -28,7 +28,7 @@ def handle_client(conn, addr, game, player_id):
     finally:
         conn.close()
         print(len(game.players))
-        handle_disconnect(game, player_id)
+        handle_disconnect(game, player_id, wrapped_socket)
 
 #function to broadcast messages to all connected clients
 def broadcast(message, game):
@@ -43,10 +43,10 @@ def accept_connections(wrapped_socket, game):
         player_id = game.add_player(conn)
         print(f"Player {player_id + 1} connected from {addr}")
         conn.sendall(f"PLAYER {player_id + 1}".encode())
-        threading.Thread(target=handle_client, args=(conn, addr, game, player_id)).start()
+        threading.Thread(target=handle_client, args=(conn, addr, game, player_id, wrapped_socket)).start()
 
 #function to handle the client disconnect
-def handle_disconnect(game, player_id):
+def handle_disconnect(game, player_id, wrapped_socket):
     game.players.pop(player_id)
     print(len(game.players))
     print(f"Player {player_id + 1} disconnected")
