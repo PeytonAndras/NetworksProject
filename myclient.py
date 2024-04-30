@@ -82,8 +82,8 @@ class TicTacToeBoard(tk.Tk):
                     self.after(0, lambda: self.update_board(int(row), int(col), label))
                     
                 elif data.startswith("OPPONENT_DISCONNECTED"):
-                    self.after(0, lambda: messagebox.showinfo("Game Info", "Your opponent has disconnected."))
-                    self.after(0, self.disable_board)
+                    self.reset_game()
+                    self.status_label.config(text="Reset Game!")
 
                     #enable the board if it's this client's turn next; this logic might need refinement based on server's game state management
                     if label != self.player_label:
